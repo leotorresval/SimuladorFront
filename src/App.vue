@@ -1,7 +1,10 @@
 <template>
-  <NetworkMap />
+  <n-config-provider>
+    <MainLayout />
+  </n-config-provider>
 </template>
 
 <script setup>
-import NetworkMap from './components/NetworkMap.vue'
+import { NConfigProvider } from 'naive-ui'
+import MainLayout from '@/layout/MainLayout.vue'
 </script>
