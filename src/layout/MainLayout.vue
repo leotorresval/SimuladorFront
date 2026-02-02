@@ -1,41 +1,51 @@
 <template>
-  <div class="split-layout">
-    <!-- PANEL IZQUIERDO -->
-    <div
-      class="left-panel"
-      :style="{ width: leftWidth + 'px' }"
-    >
-      <SimulatorPanel />
+  <div class="main-layout">
+
+    <!-- FILA SUPERIOR: PARÁMETROS -->
+    <div class="top-panel">
+      <ParameterPanel />
     </div>
 
-    <!-- DIVISOR -->
-    <div
-      class="divider"
-      @mousedown="startDrag"
-    />
+    <!-- FILA INFERIOR: SIMULADOR + TABLAS -->
+    <div class="bottom-panel">
 
-    <!-- PANEL DERECHO -->
-    <div class="right-panel">
-      <ParameterPanel />
-      <TablesPanel />
+      <!-- SIMULADOR -->
+      <div
+        class="left-panel"
+        :style="{ width: leftWidth + 'px' }"
+      >
+        <SimulatorPanel />
+      </div>
+
+      <!-- DIVISOR -->
+      <div
+        class="v-divider"
+        @mousedown="startDrag"
+      />
+
+      <!-- TABLAS -->
+      <div class="right-panel">
+        <TablesPanel />
+      </div>
+
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onBeforeUnmount } from 'vue'
-import SimulatorPanel from '@/simulator/SimulatorPanel.vue'
 import ParameterPanel from '@/parameters/ParameterPanel.vue'
+import SimulatorPanel from '@/simulator/SimulatorPanel.vue'
 import TablesPanel from '@/tables/TablesPanel.vue'
 
-/* ===== CONFIGURACIÓN ===== */
-const MIN_LEFT = 700      // mínimo simulador
-const MIN_RIGHT = 400     // mínimo parámetros
+/* ===== CONFIG ===== */
+const MIN_LEFT = 480
+const MIN_RIGHT = 420
 
-const leftWidth = ref(window.innerWidth * 0.65)
+const leftWidth = ref(window.innerWidth * 0.6)
 let isDragging = false
 
-/* ===== DRAG LOGIC ===== */
+/* ===== DRAG HORIZONTAL ===== */
 function startDrag() {
   isDragging = true
   document.addEventListener('mousemove', onDrag)
@@ -70,24 +80,39 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.split-layout {
-  display: flex;
-  width: 100%;
+.main-layout {
   height: 100vh;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
-/* IZQUIERDA */
+/* ===== TOP: PARÁMETROS ===== */
+.top-panel {
+  flex-shrink: 0;
+  padding: 0;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+}
+
+/* ===== BOTTOM ===== */
+.bottom-panel {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* SIMULADOR */
 .left-panel {
   height: 100%;
   overflow: auto;
   padding: 12px;
 }
 
-/* DERECHA */
+/* TABLAS */
 .right-panel {
   flex: 1;
-  min-width: 360px;
+  min-width: 420px;
   height: 100%;
   overflow: auto;
   padding: 12px;
@@ -95,13 +120,13 @@ onBeforeUnmount(() => {
 }
 
 /* DIVISOR */
-.divider {
+.v-divider {
   width: 6px;
   cursor: col-resize;
   background-color: transparent;
 }
 
-.divider:hover {
+.v-divider:hover {
   background-color: #d1d5db;
 }
 </style>

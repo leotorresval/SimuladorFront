@@ -1,7 +1,5 @@
 <template>
-  <n-card title="SIMULADOR" size="large">
     <MapTabs />
-  </n-card>
 </template>
 
 <script setup>
