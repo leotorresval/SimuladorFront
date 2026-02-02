@@ -3,7 +3,8 @@
 
     <!-- FILA SUPERIOR: PARÁMETROS -->
     <div class="top-panel">
-      <ParameterPanel />
+      <ParameterPanel @simulation-done="onSimulationDone" />
+
     </div>
 
     <!-- FILA INFERIOR: SIMULADOR + TABLAS -->
@@ -14,7 +15,8 @@
         class="left-panel"
         :style="{ width: leftWidth + 'px' }"
       >
-        <SimulatorPanel />
+        <SimulatorPanel :simulationResult="simulationResult" />
+
       </div>
 
       <!-- DIVISOR -->
@@ -37,6 +39,8 @@ import { ref, onBeforeUnmount } from 'vue'
 import ParameterPanel from '@/parameters/ParameterPanel.vue'
 import SimulatorPanel from '@/simulator/SimulatorPanel.vue'
 import TablesPanel from '@/tables/TablesPanel.vue'
+
+const simulationResult = ref(null)
 
 /* ===== CONFIG ===== */
 const MIN_LEFT = 480
@@ -72,6 +76,11 @@ function stopDrag() {
   document.removeEventListener('mouseup', stopDrag)
   document.body.style.cursor = 'default'
 }
+
+function onSimulationDone(result: any) {
+  simulationResult.value = result
+}
+
 
 onBeforeUnmount(() => {
   document.removeEventListener('mousemove', onDrag)

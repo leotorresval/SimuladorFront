@@ -23,14 +23,14 @@
         <!-- MAGNITUD -->
         <n-grid-item>
           <n-form-item label="Magnitud" :show-feedback="false">
-            <n-input-number v-model:value="magnitude" style="width: 100%" />
+            <n-input-number v-model:value="magnitude" :min="0" :max="10" :step="0.1" style="width: 100%" />
           </n-form-item>
         </n-grid-item>
 
         <!-- PROFUNDIDAD -->
         <n-grid-item>
           <n-form-item label="Profundidad" :show-feedback="false">
-            <n-input-number v-model:value="depth" style="width: 100%" />
+            <n-input-number v-model:value="depth" :min="1000" :max="10000" :step="100" style="width: 100%" />
           </n-form-item>
         </n-grid-item>
 
@@ -69,9 +69,13 @@ import {
 import { runSimulation } from '@/services/api'
 
 const file = ref<File | null>(null)
-const magnitude = ref<number | null>(null)
-const depth = ref<number | null>(null)
+const magnitude =  ref(6.5)
+const depth = ref(10000)
 const loading = ref(false)
+const emit = defineEmits<{
+  (e: 'simulation-done', result: any): void
+}>()
+
 
 function onFileChange({ file: uploadFile }: any) {
   file.value = uploadFile?.file ?? null
@@ -91,6 +95,7 @@ async function onSimulate() {
   loading.value = true
   try {
     const result = await runSimulation(formData)
+    emit('simulation-done', result)
     console.log('Resultado simulación:', result)
   } catch (err) {
     console.error('Error simulación', err)
