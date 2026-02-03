@@ -193,8 +193,7 @@ watch(
         map.invalidateSize()
 
         // 🔥 CLAVE: redibujar capas al volver al tab
-        drawMap({ fit: !hasFitted })
-
+        drawMap({ fit: false })
       }, 60)
     }
   },

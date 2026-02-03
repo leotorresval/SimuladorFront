@@ -65,6 +65,7 @@ import {
   NGrid,
   NGridItem
 } from 'naive-ui'
+import { simulationResult } from '@/services/simulationStore'
 
 import { runSimulation } from '@/services/api'
 
@@ -95,6 +96,7 @@ async function onSimulate() {
   loading.value = true
   try {
     const result = await runSimulation(formData)
+    simulationResult.value = result
     emit('simulation-done', result)
     console.log('Resultado simulación:', result)
   } catch (err) {
