@@ -1,0 +1,10 @@
+/* Permitir que los tabs ocupen altura completa */
+.n-tab-pane {
+  height: 100%;
+}
+
+/* Panel donde están mapas y gráficas */
+.bottom-panel,
+.left-panel {
+  height: 100%;
+}

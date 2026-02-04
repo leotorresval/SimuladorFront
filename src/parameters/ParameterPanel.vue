@@ -85,7 +85,7 @@ import {
 import { simulationResult } from '@/services/simulationStore'
 
 import { runSimulation } from '@/services/api'
-
+import { epicenter } from '../services/simulationStore'
 const file = ref<File | null>(null)
 const magnitude =  ref(6.5)
 const x =  ref(787671.8935)
@@ -118,6 +118,12 @@ async function onSimulate() {
   try {
     const result = await runSimulation(formData)
     simulationResult.value = result
+    epicenter.value = {
+      x: x.value,
+      y: y.value,
+      magnitude: magnitude.value,
+      depth: depth.value
+    }
     emit('simulation-done', result)
     console.log('Resultado simulación:', result)
   } catch (err) {

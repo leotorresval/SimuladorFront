@@ -1,0 +1,172 @@
+// function drawEpicenter() {
+//   if (!map || !props.epicenter?.x || !props.epicenter?.y) return
+
+//   if (epicenterLayer) {
+//     epicenterLayer.remove()
+//     epicenterLayer = null
+//   }
+
+//   epicenterLayer = L.layerGroup().addTo(map)
+
+//   // círculo grande (onda)
+//   L.circle(
+//     [props.epicenter.y, props.epicenter.x],
+//     {
+//       radius: 800, // ajusta según escala
+//       color: 'red',
+//       weight: 2,
+//       fillOpacity: 0.15
+//     }
+//   ).addTo(epicenterLayer)
+
+//   // punto central
+//   L.circleMarker(
+//     [props.epicenter.y, props.epicenter.x],
+//     {
+//       radius: 6,
+//       color: '#000',
+//       fillColor: 'red',
+//       fillOpacity: 1
+//     }
+//   )
+//     .bindTooltip('Epicentro')
+//     .addTo(epicenterLayer)
+// }
+
+// function drawEpicenter() {
+//   if (!map || !props.epicenter?.x || !props.epicenter?.y) return
+
+//   if (epicenterLayer) {
+//     epicenterLayer.remove()
+//     epicenterLayer = null
+//   }
+
+//   epicenterLayer = L.circleMarker(
+//     [props.epicenter.y, props.epicenter.x],
+//     {
+//       radius: 10,
+//       color: '#000',
+//       weight: 2,
+//       fillColor: '#ff0000',
+//       fillOpacity: 1
+//     }
+//   )
+//     .bindTooltip(
+//       `<b>Epicentro</b><br/>
+//        X: ${props.epicenter.x.toFixed(2)}<br/>
+//        Y: ${props.epicenter.y.toFixed(2)}`
+//     )
+//     .addTo(map)
+// }
+
+
+// function drawEpicenter() {
+//   if (!map || !props.epicenter?.x || !props.epicenter?.y) return
+
+//   // eliminar anterior
+//   if (epicenterLayer) {
+//     epicenterLayer.remove()
+//     epicenterLayer = null
+//   }
+
+//   const epicenterIcon = L.divIcon({
+//     className: 'epicenter-icon',
+//     html: '💥', // puedes cambiar: ✖ ● ▲ 💥 🌋
+//     iconSize: [30, 30],
+//     iconAnchor: [12, 12]
+//   })
+
+//   epicenterLayer = L.marker(
+//     [props.epicenter.y, props.epicenter.x],
+//     { icon: epicenterIcon }
+//   )
+//     .bindTooltip(
+//       `<b>Epicentro</b><br/>
+//        X: ${props.epicenter.x.toFixed(2)}<br/>
+//        Y: ${props.epicenter.y.toFixed(2)}`
+//     )
+//     .addTo(map)
+// }
+
+
+// function drawEpicenter() {
+//   if (!map || !props.epicenter?.x || !props.epicenter?.y) return
+
+//   if (epicenterLayer) {
+//     epicenterLayer.remove()
+//     epicenterLayer = null
+//   }
+
+//   const epicenterIcon = L.divIcon({
+//     className: 'epicenter-emoji',
+//     html: '📍', // 👉 puedes cambiar el emoji aquí
+//     iconSize: [28, 28],
+//     iconAnchor: [14, 14]
+//   })
+
+//   epicenterLayer = L.marker(
+//     [props.epicenter.y, props.epicenter.x],
+//     { icon: epicenterIcon }
+//   )
+//     .bindTooltip(
+//       `<b>Epicentro</b><br/>
+//        X: ${props.epicenter.x.toFixed(2)}<br/>
+//        Y: ${props.epicenter.y.toFixed(2)}`
+//     )
+//     .addTo(map)
+// }
+
+// function drawEpicenter() {
+//   if (!map || !props.epicenter?.x || !props.epicenter?.y) return
+
+//   // Limpiar epicentro anterior
+//   if (epicenterLayer) {
+//     epicenterLayer.remove()
+//     epicenterLayer = null
+//   }
+
+//   epicenterLayer = L.layerGroup().addTo(map)
+
+//   const lat = props.epicenter.y
+//   const lng = props.epicenter.x
+
+//   // 🔥 CONFIGURACIÓN
+//   const rings = 3        // número de círculos
+//   const baseRadius = 7   // radio del núcleo
+//   const gap = 3          // separación entre círculos
+
+//   // 🔴 Núcleo
+//   L.circleMarker(
+//     [lat, lng],
+//     {
+//       radius: baseRadius,
+//       color: '#000',
+//       fillColor: 'red',
+//       fillOpacity: 1
+//     }
+//   ).addTo(epicenterLayer)
+
+//   // 🔴 Ondas concéntricas
+//   for (let i = 1; i <= rings; i++) {
+//     L.circleMarker(
+//       [lat, lng],
+//       {
+//         radius: baseRadius + i * gap,
+//         color: 'red',
+//         weight: 2,
+//         fillOpacity: 0
+//       }
+//     ).addTo(epicenterLayer)
+//   }
+
+//   // Tooltip solo en el núcleo
+//   epicenterLayer.eachLayer(layer => {
+//     if (layer instanceof L.CircleMarker && layer.options.fillOpacity === 1) {
+//       layer.bindTooltip(
+//         `<b>Epicentro</b><br/>
+//          X: ${lng.toFixed(2)}<br/>
+//          Y: ${lat.toFixed(2)}`
+//       )
+//     }
+//   })
+// }

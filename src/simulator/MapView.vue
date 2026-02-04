@@ -6,11 +6,13 @@
 import { ref, watch, nextTick } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { epicenter } from '../services/simulationStore'
 
 const props = defineProps({
   mapType: String,
   nodes: Array,
   pipes: Array,
+  epicenter: Object,
   active: Boolean
 })
 
@@ -19,7 +21,8 @@ let map = null
 let layerGroup = null
 let legendControl = null
 let hasFitted = false
-
+let epicenterLayer = null
+let waveInterval = null
 
 function pressureColor(p) {
   if (p < 5) return '#d73027'
@@ -167,8 +170,86 @@ function drawMap({ fit = false } = {}) {
     hasFitted = true
   }
 
-
+  drawEpicenter()
   createLegend()
+}
+
+
+
+function drawEpicenter() {
+  if (!map || !props.epicenter?.x || !props.epicenter?.y) return
+
+  // Limpiar anterior
+  if (epicenterLayer) {
+    epicenterLayer.remove()
+    epicenterLayer = null
+  }
+  if (waveInterval) {
+    clearInterval(waveInterval)
+    waveInterval = null
+  }
+
+  epicenterLayer = L.layerGroup().addTo(map)
+
+  const lat = props.epicenter.y
+  const lng = props.epicenter.x
+  const depth = props.epicenter.depth
+  const magnitude = props.epicenter.magnitude
+
+  // 🔴 NÚCLEO (tooltip AQUÍ)
+  const core = L.circleMarker(
+    [lat, lng],
+    {
+      radius: 7,
+      color: '#000',
+      fillColor: 'red',
+      fillOpacity: 1,
+      interactive: true   // 🔥 CLAVE
+    }
+  )
+    .bindTooltip(
+      `<b>Epicentro</b><br/>
+       X: ${lng.toFixed(2)}<br/>
+       Y: ${lat.toFixed(2)}<br/>
+       Magnitud: ${props.epicenter.magnitude ?? 'N/A'}<br/>
+       Profundidad: ${props.epicenter.depth ?? 'N/A'} km`,
+      {
+        direction: 'top',
+        offset: [0, -8],
+        sticky: true       // 🔥 CLAVE
+      }
+    )
+    .addTo(epicenterLayer)
+
+  core.bringToFront() // 🔥 CLAVE
+
+  // 🌊 ONDA EXPANSIVA (NO interactiva)
+  let radius = 8
+  let opacity = 0.5
+
+  const wave = L.circleMarker(
+    [lat, lng],
+    {
+      radius,
+      color: 'red',
+      weight: 2,
+      fillOpacity: 0,
+      interactive: false  // 🔥 CLAVE
+    }
+  ).addTo(epicenterLayer)
+
+  waveInterval = setInterval(() => {
+    radius += 2
+    opacity -= 0.02
+
+    if (opacity <= 0) {
+      radius = 8
+      opacity = 0.5
+    }
+
+    wave.setRadius(radius)
+    wave.setStyle({ opacity })
+  }, 60)
 }
 
 /* =========================
@@ -227,6 +308,18 @@ watch(
     drawMap({ fit: false })
   }
 )
+
+/* =========================
+   4) Redibujar al cambiar epicenter
+========================= */
+watch(
+  () => props.epicenter,
+  () => {
+    drawEpicenter()
+  },
+  { deep: true }
+)
+
 </script>
 
 <style scoped>
@@ -260,5 +353,17 @@ watch(
   margin-right: 6px;
   opacity: 0.9;
 }
+
+
+.epicenter-emoji {
+  font-size: 26px;
+  text-shadow: 0 0 6px rgba(255, 0, 0, 0.6);
+}
+
+:deep(.epicenter-emoji) {
+  font-size: 20px;
+  text-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
+}
+
 
 </style>

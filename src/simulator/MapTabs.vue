@@ -1,3 +1,4 @@
+
 <template>
   <n-tabs
     type="line"
@@ -9,6 +10,8 @@
         map-type="pressure"
         :nodes="nodes"
         :pipes="pipes"
+        :epicenter="epicenter"
+
         :active="activeTab === 'map1'"
       />
     </n-tab-pane>
@@ -18,6 +21,8 @@
         map-type="damage"
         :nodes="nodes"
         :pipes="pipes"
+        :epicenter="epicenter"
+
         :active="activeTab === 'map2'"
       />
     </n-tab-pane>
@@ -27,6 +32,7 @@
         map-type="pga"
         :nodes="nodes"
         :pipes="pipes"
+        :epicenter="epicenter"
         :active="activeTab === 'map3'"
       />
     </n-tab-pane>
@@ -36,25 +42,16 @@
         map-type="rr"
         :nodes="nodes"
         :pipes="pipes"
+        :epicenter="epicenter"
         :active="activeTab === 'map4'"
       />
     </n-tab-pane>
-
-    <n-tab-pane name="map5" tab="MAPA 5">
-      <MapView
-        map-type="combined"
-        :nodes="nodes"
-        :pipes="pipes"
-        :active="activeTab === 'map5'"
-      />
-    </n-tab-pane>
     <n-tab-pane name="map6" tab="CURVA DE FRAGILIDAD">
-      <MapView
-        map-type="combined"
-        :nodes="nodes"
-        :pipes="pipes"
+      <FragilityCurve
+        :data="simulationResult.fragility_curve"
         :active="activeTab === 'map6'"
       />
+
     </n-tab-pane>
   </n-tabs>
 </template>
@@ -63,7 +60,9 @@
 import { ref } from 'vue'
 import { NTabs, NTabPane } from 'naive-ui'
 import MapView from './MapView.vue'
-
+import { epicenter } from '@/services/simulationStore'
+import FragilityCurve from './FragilityCurve.vue'
+import { simulationResult} from '@/services/simulationStore'
 defineProps({
   nodes: Array,
   pipes: Array

@@ -3,7 +3,7 @@
     v-if="summary"
     bordered
     size="small"
-    column="2"
+    :column="2"
   >
     <n-descriptions-item label="Tiempo analizado (h)">
       {{ summary.time_analyzed_h }}
