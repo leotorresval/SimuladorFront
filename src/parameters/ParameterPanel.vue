@@ -7,10 +7,10 @@
 
     <!-- FORM -->
     <n-form label-placement="top">
-      <n-grid :cols="5" x-gap="20" y-gap="8">
+      <n-grid :cols="6" x-gap="20" y-gap="8">
 
         <!-- ARCHIVO INP -->
-        <n-grid-item :span="2">
+        <n-grid-item >
           <n-form-item label="Archivo INP" :show-feedback="false">
             <n-upload :max="1" @change="onFileChange">
               <n-button block>
@@ -19,6 +19,23 @@
             </n-upload>
           </n-form-item>
         </n-grid-item>
+
+                <!-- EJE_X -->
+        <n-grid-item>
+          <n-form-item label="Longitud / Eje x" :show-feedback="false">
+            <n-input-number v-model:value="x" :min="166000" :max="834000" :step="500" style="width: 100%" />
+          </n-form-item>
+        </n-grid-item>
+
+        <!-- EJE_Y -->
+        <n-grid-item>
+          <n-form-item label="Latitud / Eje y" :show-feedback="false">
+            <n-input-number v-model:value="y" :min="0" :max="10000000" :step="500" style="width: 100%" />
+          </n-form-item>
+        </n-grid-item>
+
+        
+
 
         <!-- MAGNITUD -->
         <n-grid-item>
@@ -71,6 +88,8 @@ import { runSimulation } from '@/services/api'
 
 const file = ref<File | null>(null)
 const magnitude =  ref(6.5)
+const x =  ref(787671.8935)
+const y = ref(9992673.3202)
 const depth = ref(10000)
 const loading = ref(false)
 const emit = defineEmits<{
@@ -92,6 +111,8 @@ async function onSimulate() {
   formData.append('inp_file', file.value)
   formData.append('magnitude', String(magnitude.value))
   formData.append('depth', String(depth.value))
+  formData.append('x', String(x.value))
+  formData.append('y', String(y.value))
 
   loading.value = true
   try {

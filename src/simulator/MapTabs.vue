@@ -4,7 +4,7 @@
     animated
     v-model:value="activeTab"
   >
-    <n-tab-pane name="map1" tab="MAPA 1">
+    <n-tab-pane name="map1" tab="PRESIÓN EN NODOS">
       <MapView
         map-type="pressure"
         :nodes="nodes"
@@ -13,7 +13,7 @@
       />
     </n-tab-pane>
 
-    <n-tab-pane name="map2" tab="MAPA 2">
+    <n-tab-pane name="map2" tab="DAÑO EN TUBERÍAS">
       <MapView
         map-type="damage"
         :nodes="nodes"
@@ -22,7 +22,7 @@
       />
     </n-tab-pane>
 
-    <n-tab-pane name="map3" tab="MAPA 3">
+    <n-tab-pane name="map3" tab="VELOCIDAD EN ROCA">
       <MapView
         map-type="pga"
         :nodes="nodes"
@@ -31,7 +31,7 @@
       />
     </n-tab-pane>
 
-    <n-tab-pane name="map4" tab="MAPA 4">
+    <n-tab-pane name="map4" tab="TASA DE REPARACIÓN">
       <MapView
         map-type="rr"
         :nodes="nodes"
@@ -46,6 +46,14 @@
         :nodes="nodes"
         :pipes="pipes"
         :active="activeTab === 'map5'"
+      />
+    </n-tab-pane>
+    <n-tab-pane name="map6" tab="CURVA DE FRAGILIDAD">
+      <MapView
+        map-type="combined"
+        :nodes="nodes"
+        :pipes="pipes"
+        :active="activeTab === 'map6'"
       />
     </n-tab-pane>
   </n-tabs>

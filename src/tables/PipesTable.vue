@@ -23,12 +23,11 @@ const columns = [
   { title: 'PGA', key: 'pga',   render: (row) => formatNumber(row.pga, 4) },
   { title: 'PGV', key: 'pgv',   render: (row) => formatNumber(row.pgv, 4) },
   { title: 'RR', key: 'repair_rate', render: (row) => formatNumber(row.repair_rate, 4) },
-  { title: 'Longitud (m)', key: 'length', render: (row) => formatNumber(row.length, 2) },
-  { title: 'Diámetro (m)', key: 'diameter', render: (row) => formatNumber(row.diameter, 2) },
+  { title: 'Longitud (m)', key: 'length', render: (row) => formatNumber(row.length, 3) },
+  { title: 'Diámetro (m)', key: 'diameter', render: (row) => formatNumber(row.diameter, 3) },
   { title: 'Índice daño', key: 'damage_index', render: (row) => formatNumber(row.damage_index, 4) },
-  { title: 'P. Fuga Menor', key: 'p_minor_leak', render: (row) => formatNumber(row.p_minor_leak, 4) },
-  { title: 'P. Fuga Mayor', key: 'p_major_leak', render: (row) => formatNumber(row.p_major_leak, 4) },
-  { title: 'P. Rotura', key: 'p_break', render: (row) => formatNumber(row.p_break, 4) },
+  { title: 'P. Fuga Menor', key: 'p_minor_leak',  render: (row) => formatNumber(row.p_minor_leak, 4) },
+  { title: 'P. Fuga Mayor', key: 'p_major_leak', render: (row) => formatNumber(row.p_major_leak, 4) }
 ]
 
 function formatNumber(value, decimals = 4) {

@@ -135,8 +135,10 @@ function drawMap({ fit = false } = {}) {
       )
         .bindTooltip(
           `<b>Tubería:</b> ${p.id}<br/>
-           <b>Daño:</b> ${p.damage_state ?? 'Ninguno'}<br/>
-           <b>Repair rate:</b> ${p.repair_rate?.toExponential?.(2) ?? p.repair_rate}`
+           <b>Material:</b> ${p.material}<br/> 
+           <b>Diametro:</b> ${p.diameter ?? 'Ninguno'}<br/>
+           <b>Longitud:</b> ${p.length.toFixed(3) ?? 'Ninguno'} m<br/>
+           <b>Velocidad: ${Number(p.speed).toFixed(2)} m/s<br/>`
         )
         .addTo(layerGroup)
     })
@@ -151,7 +153,10 @@ function drawMap({ fit = false } = {}) {
     })
       .bindTooltip(
         `<b>Nodo:</b> ${n.id}<br/>
-         <b>Presión:</b> ${Number(n.pressure).toFixed(2)} m`
+         <b>Cota:</b> ${Number(n.elevation).toFixed(2)} m <br/>
+         <b>Presión:</b> ${Number(n.pressure).toFixed(2)} m<br/>
+         <b>Demanda:</b> ${Number(n.demand).toFixed(2)} L/s`
+         
       )
       .addTo(layerGroup)
   })
@@ -228,7 +233,7 @@ watch(
 .map-container {
   width: 100%;
   height: 100%;
-  min-height: 420px; /* mantiene el tamaño que tenías */
+  min-height: 370px; /* mantiene el tamaño que tenías */
   background: #fafafa;
 }
 
