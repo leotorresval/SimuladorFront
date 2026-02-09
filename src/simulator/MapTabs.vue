@@ -1,8 +1,10 @@
 
 <template>
+    <div ref="tabsWrapper" class="tabs-wrapper">
   <n-tabs
     type="line"
     animated
+    scrollable
     v-model:value="activeTab"
   >
     <n-tab-pane name="map1" tab="PRESIÓN EN NODOS">
@@ -54,10 +56,11 @@
 
     </n-tab-pane>
   </n-tabs>
+  </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { NTabs, NTabPane } from 'naive-ui'
 import MapView from './MapView.vue'
 import { epicenter } from '@/services/simulationStore'
@@ -69,4 +72,30 @@ defineProps({
 })
 
 const activeTab = ref('map1')
+const tabsWrapper = ref<HTMLElement | null>(null)
+
+let resizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  if (!tabsWrapper.value) return
+
+  resizeObserver = new ResizeObserver(() => {
+    // fuerza re-render suave
+    nextTick(() => {
+      activeTab.value = activeTab.value
+    })
+  })
+
+  resizeObserver.observe(tabsWrapper.value)
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+})
+
 </script>
+<style scoped>
+.tabs-wrapper {
+  width: 100%;
+}
+</style>
