@@ -6,7 +6,6 @@
 import { ref, watch, nextTick } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { epicenter } from '../services/simulationStore'
 
 const props = defineProps({
   mapType: String,
@@ -20,10 +19,13 @@ const mapRef = ref(null)
 let map = null
 let layerGroup = null
 let legendControl = null
-let hasFitted = false
 let epicenterLayer = null
 let waveInterval = null
+let hasFitted = false
 
+/* =========================
+   COLORES
+========================= */
 function pressureColor(p) {
   if (p < 5) return '#d73027'
   if (p < 15) return '#fc8d59'
@@ -51,6 +53,9 @@ function pipeColor(p) {
   return '#666'
 }
 
+/* =========================
+   LEYENDA
+========================= */
 function getLegendHTML() {
   if (props.mapType === 'pressure') {
     return `
@@ -90,6 +95,7 @@ function getLegendHTML() {
 }
 
 function createLegend() {
+  console.log('MAP TYPE:', props.mapType)
   if (!map) return
 
   if (legendControl) {
@@ -109,64 +115,68 @@ function createLegend() {
   legendControl.addTo(map)
 }
 
+/* =========================
+   DIBUJAR MAPA
+========================= */
 function drawMap({ fit = false } = {}) {
   if (!map || !layerGroup || !props.nodes?.length) return
 
   layerGroup.clearLayers()
 
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
   const nodeMap = {}
+  let minLat = Infinity, minLng = Infinity
+  let maxLat = -Infinity, maxLng = -Infinity
 
   props.nodes.forEach(n => {
+    if (n.lat == null || n.lng == null) return
     nodeMap[n.id] = n
-    minX = Math.min(minX, n.x)
-    minY = Math.min(minY, n.y)
-    maxX = Math.max(maxX, n.x)
-    maxY = Math.max(maxY, n.y)
+    minLat = Math.min(minLat, n.lat)
+    minLng = Math.min(minLng, n.lng)
+    maxLat = Math.max(maxLat, n.lat)
+    maxLng = Math.max(maxLng, n.lng)
   })
 
-  // Tuberías primero
-  if (props.pipes?.length) {
-    props.pipes.forEach(p => {
-      const from = nodeMap[p.from]
-      const to = nodeMap[p.to]
-      if (!from || !to) return
+  /* ---- TUBERÍAS ---- */
+  props.pipes?.forEach(p => {
+    const from = nodeMap[p.from]
+    const to = nodeMap[p.to]
+    if (!from || !to) return
 
-      L.polyline(
-        [[from.y, from.x], [to.y, to.x]],
-        { color: pipeColor(p), weight: 3, opacity: 0.8 }
+    L.polyline(
+      [[from.lat, from.lng], [to.lat, to.lng]],
+      { color: pipeColor(p), weight: 3, opacity: 0.85 }
+    )
+      .bindTooltip(
+        `<b>Tubería:</b> ${p.id}<br/>
+         <b>Material:</b> ${p.material}<br/>
+         <b>Diámetro:</b> ${p.diameter ?? 'N/A'}<br/>
+         <b>Longitud:</b> ${p.length?.toFixed(2)} m<br/>
+         <b>Velocidad:</b> ${Number(p.speed).toFixed(2)} m/s <br/>
+         <b>Caudal:</b> ${Number(p.flowrate_lps ?? p.flowrate ?? 0).toFixed(2)} L/s<br/>`
       )
-        .bindTooltip(
-          `<b>Tubería:</b> ${p.id}<br/>
-           <b>Material:</b> ${p.material}<br/> 
-           <b>Diametro:</b> ${p.diameter ?? 'Ninguno'}<br/>
-           <b>Longitud:</b> ${p.length.toFixed(3) ?? 'Ninguno'} m<br/>
-           <b>Velocidad: ${Number(p.speed).toFixed(2)} m/s<br/>`
-        )
-        .addTo(layerGroup)
-    })
-  }
+      .addTo(layerGroup)
+  })
 
-  // Nodos encima
+  /* ---- NODOS ---- */
   props.nodes.forEach(n => {
-    L.circle([n.y, n.x], {
-      radius: 12,
+    if (n.lat == null || n.lng == null) return
+
+    L.circleMarker([n.lat, n.lng], {
+      radius: 6,
       color: pressureColor(n.pressure),
       fillOpacity: 0.9
     })
       .bindTooltip(
         `<b>Nodo:</b> ${n.id}<br/>
-         <b>Cota:</b> ${Number(n.elevation).toFixed(2)} m <br/>
-         <b>Presión:</b> ${Number(n.pressure).toFixed(2)} m<br/>
-         <b>Demanda:</b> ${Number(n.demand).toFixed(2)} L/s`
-         
+         <b>Cota:</b> ${n.elevation.toFixed(2)} m<br/>
+         <b>Presión:</b> ${n.pressure.toFixed(2)} m<br/>
+         <b>Demanda:</b> ${n.demand_lps.toFixed(3)} L/s`
       )
       .addTo(layerGroup)
   })
 
-  if ((fit || !hasFitted) && isFinite(minX)) {
-    const bounds = L.latLngBounds([minY, minX], [maxY, maxX])
-    map.fitBounds(bounds)
+  if ((fit || !hasFitted) && isFinite(minLat)) {
+    map.fitBounds([[minLat, minLng], [maxLat, maxLng]])
     hasFitted = true
   }
 
@@ -174,195 +184,138 @@ function drawMap({ fit = false } = {}) {
   createLegend()
 }
 
-
-
+/* =========================
+   EPICENTRO
+========================= */
 function drawEpicenter() {
-  if (!map || !props.epicenter?.x || !props.epicenter?.y) return
+  if (!map || !props.epicenter?.lat || !props.epicenter?.lng) return
 
-  // Limpiar anterior
-  if (epicenterLayer) {
-    epicenterLayer.remove()
-    epicenterLayer = null
-  }
-  if (waveInterval) {
-    clearInterval(waveInterval)
-    waveInterval = null
-  }
+  if (epicenterLayer) epicenterLayer.remove()
+  if (waveInterval) clearInterval(waveInterval)
 
   epicenterLayer = L.layerGroup().addTo(map)
 
-  const lat = props.epicenter.y
-  const lng = props.epicenter.x
-  const depth = props.epicenter.depth
-  const magnitude = props.epicenter.magnitude
+  const { lat, lng, magnitude, depth } = props.epicenter
 
-  // 🔴 NÚCLEO (tooltip AQUÍ)
-  const core = L.circleMarker(
-    [lat, lng],
-    {
-      radius: 7,
-      color: '#000',
-      fillColor: 'red',
-      fillOpacity: 1,
-      interactive: true   // 🔥 CLAVE
-    }
-  )
+  const core = L.circleMarker([lat, lng], {
+    radius: 7,
+    color: '#000',
+    fillColor: 'red',
+    fillOpacity: 1
+  })
     .bindTooltip(
       `<b>Epicentro</b><br/>
-       X: ${lng.toFixed(2)}<br/>
-       Y: ${lat.toFixed(2)}<br/>
-       Magnitud: ${props.epicenter.magnitude ?? 'N/A'}<br/>
-       Profundidad: ${props.epicenter.depth ?? 'N/A'} km`,
-      {
-        direction: 'top',
-        offset: [0, -8],
-        sticky: true       // 🔥 CLAVE
-      }
+       Lat: ${lat.toFixed(5)}<br/>
+       Lng: ${lng.toFixed(5)}<br/>
+       Magnitud: ${magnitude ?? 'N/A'}<br/>
+       Profundidad: ${depth ?? 'N/A'} km`,
+      { sticky: true }
     )
     .addTo(epicenterLayer)
 
-  core.bringToFront() // 🔥 CLAVE
+  core.bringToFront()
 
-  // 🌊 ONDA EXPANSIVA (NO interactiva)
   let radius = 8
   let opacity = 0.5
 
-  const wave = L.circleMarker(
-    [lat, lng],
-    {
-      radius,
-      color: 'red',
-      weight: 2,
-      fillOpacity: 0,
-      interactive: false  // 🔥 CLAVE
-    }
-  ).addTo(epicenterLayer)
+  const wave = L.circleMarker([lat, lng], {
+    radius,
+    color: 'red',
+    weight: 2,
+    fillOpacity: 0,
+    interactive: false
+  }).addTo(epicenterLayer)
 
   waveInterval = setInterval(() => {
     radius += 2
-    opacity -= 0.02
-
+    opacity -= 0.03
     if (opacity <= 0) {
       radius = 8
       opacity = 0.5
     }
-
     wave.setRadius(radius)
     wave.setStyle({ opacity })
   }, 60)
 }
 
 /* =========================
-   1) Crear mapa cuando el tab está activo
+   WATCHERS
 ========================= */
 watch(
   () => props.active,
-  async (isActive) => {
+  async isActive => {
     if (!isActive) return
-
     await nextTick()
 
     if (!map && mapRef.value) {
-      // crear mapa si no existe
-      map = L.map(mapRef.value, {
-        crs: L.CRS.Simple,
-        zoomControl: true,
-        minZoom: -10
-      })
+      map = L.map(mapRef.value)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map)
+
       layerGroup = L.layerGroup().addTo(map)
       hasFitted = false
-
     }
 
-    if (map) {
-      setTimeout(() => {
-        map.invalidateSize()
-
-        // 🔥 CLAVE: redibujar capas al volver al tab
-        drawMap({ fit: false })
-      }, 60)
-    }
+    setTimeout(() => {
+      map.invalidateSize()
+      drawMap({ fit: false })
+    }, 60)
   },
   { immediate: true }
 )
 
-/* =========================
-   2) Redibujar cuando llegan datos (Simular)
-   -> aquí SÍ hacemos fitBounds
-========================= */
 watch(
   () => [props.nodes, props.pipes],
-  () => {
-    drawMap({ fit: true })
-  },
-  { deep: true, immediate: true }
-)
-
-/* =========================
-   3) Redibujar al cambiar mapType (cambio de tab)
-   -> NO hacemos fitBounds para no “saltar” la cámara
-========================= */
-watch(
-  () => props.mapType,
-  () => {
-    drawMap({ fit: false })
-  }
-)
-
-/* =========================
-   4) Redibujar al cambiar epicenter
-========================= */
-watch(
-  () => props.epicenter,
-  () => {
-    drawEpicenter()
-  },
+  () => drawMap({ fit: true }),
   { deep: true }
 )
 
+watch(
+  () => props.mapType,
+  () => {drawMap({ fit: false })
+ createLegend()  }
+)
+
+watch(
+  () => props.epicenter,
+  () => drawEpicenter(),
+  { deep: true }
+)
 </script>
 
 <style scoped>
 .map-container {
   width: 100%;
   height: 100%;
-  min-height: 370px; /* mantiene el tamaño que tenías */
-  background: #fafafa;
+  min-height: 370px;
+    position: relative;     /* 🔥 CLAVE */
+  z-index: 0;  
 }
 
 :deep(.map-legend) {
   background: white;
   padding: 8px 10px;
   font-size: 12px;
-  line-height: 18px;
-  color: #333;
   border-radius: 4px;
   box-shadow: 0 0 6px rgba(0,0,0,0.2);
+  z-index: 1000;
 }
 
 :deep(.map-legend h4) {
   margin: 0 0 6px;
   font-size: 13px;
-  font-weight: 600;
 }
 
-:deep(.map-legend i) {
-  width: 14px;
-  height: 14px;
-  float: left;
-  margin-right: 6px;
-  opacity: 0.9;
-}
-
-
-.epicenter-emoji {
-  font-size: 26px;
-  text-shadow: 0 0 6px rgba(255, 0, 0, 0.6);
-}
-
-:deep(.epicenter-emoji) {
-  font-size: 20px;
-  text-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
+.leaflet-control .map-legend {
+  background: white;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #333;
+  border-radius: 4px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.3);
+  z-index: 1000;
 }
 
 

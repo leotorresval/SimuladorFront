@@ -1,6 +1,8 @@
 <template>
   <n-config-provider>
-    <MainLayout />
+    <n-notification-provider>
+      <MainLayout />
+    </n-notification-provider>
   </n-config-provider>
 </template>
 

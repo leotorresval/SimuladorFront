@@ -4,6 +4,7 @@
     :columns="columns"
     :data="leaks"
     size="small"
+        :pagination="{ pageSize: 5 }"
   />
   <TablePlaceholder v-else />
 </template>

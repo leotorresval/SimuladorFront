@@ -4,8 +4,9 @@
     <!-- FILA SUPERIOR: PARÁMETROS -->
     <div class="top-panel">
       <ParameterPanel @simulation-done="onSimulationDone" />
-
     </div>
+
+
 
     <!-- FILA INFERIOR: SIMULADOR + TABLAS -->
     <div class="bottom-panel">
@@ -31,6 +32,20 @@
       </div>
 
     </div>
+
+        <!-- 🔔 ALERT GLOBAL -->
+    <transition name="status-fade">
+      <n-alert
+        v-if="uiStatus"
+        :type="uiStatus.type"
+        show-icon
+        closable
+        @close="clearStatus"
+        class="global-status"
+      >
+        {{ uiStatus.message }}
+      </n-alert>
+    </transition>
   </div>
 </template>
 
@@ -39,6 +54,8 @@ import { ref, onBeforeUnmount } from 'vue'
 import ParameterPanel from '@/parameters/ParameterPanel.vue'
 import SimulatorPanel from '@/simulator/SimulatorPanel.vue'
 import TablesPanel from '@/tables/TablesPanel.vue'
+import { NAlert } from 'naive-ui'
+import { uiStatus, clearStatus } from '@/services/uiStatusStore'
 
 const simulationResult = ref(null)
 
@@ -138,4 +155,25 @@ onBeforeUnmount(() => {
 .v-divider:hover {
   background-color: #d1d5db;
 }
+
+.global-status {
+  margin: 8px 12px;
+}
+
+/* Animación suave */
+.status-fade-enter-active,
+.status-fade-leave-active {
+  transition: all 0.35s ease;
+}
+
+.status-fade-enter-from {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.status-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
 </style>

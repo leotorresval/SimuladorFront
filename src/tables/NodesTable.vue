@@ -4,7 +4,7 @@
     :columns="columns"
     :data="nodes"
     size="small"
-    :pagination="{ pageSize: 8 }"
+    :pagination="{ pageSize: 5 }"
   />
   <TablePlaceholder v-else />
 </template>

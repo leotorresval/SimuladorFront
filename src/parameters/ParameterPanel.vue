@@ -5,6 +5,21 @@
       PARÁMETROS
     </div>
 
+        <!-- PANEL DE ESTADO
+<transition name="status-fade">
+  <n-alert
+    v-if="uiStatus"
+    :type="uiStatus.type"
+    show-icon
+    closable
+    @close="clearStatus"
+    class="status-alert"
+  >
+    {{ uiStatus.message }}
+  </n-alert>
+</transition> -->
+
+
     <!-- FORM -->
     <n-form label-placement="top">
       <n-grid :cols="6" x-gap="20" y-gap="8">
@@ -33,9 +48,6 @@
             <n-input-number v-model:value="y" :min="0" :max="10000000" :step="500" style="width: 100%" />
           </n-form-item>
         </n-grid-item>
-
-        
-
 
         <!-- MAGNITUD -->
         <n-grid-item>
@@ -80,9 +92,11 @@ import {
   NButton,
   NInputNumber,
   NGrid,
-  NGridItem
+  NGridItem,
+  NAlert, NSpin
 } from 'naive-ui'
 import { simulationResult } from '@/services/simulationStore'
+import { uiStatus, setStatus,clearStatus} from '@/services/uiStatusStore'
 
 import { runSimulation } from '@/services/api'
 import { epicenter } from '../services/simulationStore'
@@ -92,6 +106,7 @@ const x =  ref(787671.8935)
 const y = ref(9992673.3202)
 const depth = ref(10000)
 const loading = ref(false)
+
 const emit = defineEmits<{
   (e: 'simulation-done', result: any): void
 }>()
@@ -102,10 +117,11 @@ function onFileChange({ file: uploadFile }: any) {
 }
 
 async function onSimulate() {
-  if (!file.value || magnitude.value == null || depth.value == null) {
-    console.warn('Faltan parámetros')
-    return
-  }
+if (!file.value || magnitude.value == null || depth.value == null || x.value == null || y.value == null) {
+  setStatus('warning', 'Debe completar todos los parámetros antes de ejecutar la simulación.')
+  return
+}
+
 
   const formData = new FormData()
   formData.append('inp_file', file.value)
@@ -113,21 +129,27 @@ async function onSimulate() {
   formData.append('depth', String(depth.value))
   formData.append('x', String(x.value))
   formData.append('y', String(y.value))
+setStatus('info', 'Ejecutando simulación…')
 
-  loading.value = true
+loading.value = true
+
   try {
     const result = await runSimulation(formData)
     simulationResult.value = result
     epicenter.value = {
       x: x.value,
       y: y.value,
+      lat: result.epicenter.lat,
+      lng: result.epicenter.lng,
       magnitude: magnitude.value,
       depth: depth.value
     }
     emit('simulation-done', result)
-    console.log('Resultado simulación:', result)
+setStatus('success', 'Simulación ejecutada correctamente.')
+
+
   } catch (err) {
-    console.error('Error simulación', err)
+    setStatus('error', err.message || 'Error al ejecutar la simulación.')
   } finally {
     loading.value = false
   }
@@ -152,4 +174,21 @@ async function onSimulate() {
 :deep(.param-card .n-form-item-feedback-wrapper) {
   display: none;
 }
+
+
+.status-fade-enter-active,
+.status-fade-leave-active {
+  transition: all 0.35s ease;
+}
+
+.status-fade-enter-from {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.status-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
 </style>

@@ -8,3 +8,35 @@
 .left-panel {
   height: 100%;
 }
+
+
+/* ===============================
+   FIX LEYENDA LEAFLET
+================================ */
+
+.leaflet-control {
+  z-index: 1000 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 1000 !important;
+}
+
+.map-legend {
+  background: white;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #333;
+  border-radius: 4px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.3);
+}
+
+.map-legend i {
+  width: 14px;
+  height: 14px;
+  float: left;
+  margin-right: 6px;
+  opacity: 0.9;
+}
