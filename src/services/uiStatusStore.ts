@@ -22,7 +22,6 @@ export function setStatus (
 
   uiStatus.value = { type, message }
 
-  // ⏱️ Autocierre solo para info / success
   if (autoClose && (type === 'info' || type === 'success')) {
     timeoutId = window.setTimeout(() => {
       uiStatus.value = null

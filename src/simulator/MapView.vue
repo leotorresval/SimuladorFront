@@ -12,7 +12,8 @@ const props = defineProps({
   nodes: Array,
   pipes: Array,
   epicenter: Object,
-  active: Boolean
+  active: Boolean,
+  showBaseMap: Boolean
 })
 
 const mapRef = ref(null)
@@ -22,6 +23,7 @@ let legendControl = null
 let epicenterLayer = null
 let waveInterval = null
 let hasFitted = false
+let baseLayer = null
 
 /* =========================
    COLORES
@@ -162,7 +164,7 @@ function drawMap({ fit = false } = {}) {
     if (n.lat == null || n.lng == null) return
 
     L.circleMarker([n.lat, n.lng], {
-      radius: 6,
+      radius: getRadiusByZoom(),
       color: pressureColor(n.pressure),
       fillOpacity: 0.9
     })
@@ -238,6 +240,20 @@ function drawEpicenter() {
   }, 60)
 }
 
+function toggleBaseMap(show) {
+  if (!map || !baseLayer) return
+
+  if (show) {
+    map.addLayer(baseLayer)
+  } else {
+    map.removeLayer(baseLayer)
+  }
+}
+
+function getRadiusByZoom() {
+  const zoom = map.getZoom()
+  return Math.max(2, (zoom - 12) * 1.2)
+}
 /* =========================
    WATCHERS
 ========================= */
@@ -249,12 +265,24 @@ watch(
 
     if (!map && mapRef.value) {
       map = L.map(mapRef.value)
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      
+      baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map)
+      // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      //   attribution: '&copy; OpenStreetMap contributors'
+      // }).addTo(map)
+
+        if (!props.showBaseMap) {
+          map.removeLayer(baseLayer)
+        }
+
 
       layerGroup = L.layerGroup().addTo(map)
       hasFitted = false
+              map.on('zoomend', () => {
+          drawMap({ fit: false })
+        })
     }
 
     setTimeout(() => {
@@ -264,6 +292,8 @@ watch(
   },
   { immediate: true }
 )
+
+
 
 watch(
   () => [props.nodes, props.pipes],
@@ -282,6 +312,16 @@ watch(
   () => drawEpicenter(),
   { deep: true }
 )
+
+watch(
+  () => props.showBaseMap,
+  (val) => {
+    toggleBaseMap(val)
+  }
+)
+
+
+
 </script>
 
 <style scoped>

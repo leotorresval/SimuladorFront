@@ -27,9 +27,9 @@
         <!-- ARCHIVO INP -->
         <n-grid-item >
           <n-form-item label="Archivo INP" :show-feedback="false">
-            <n-upload :max="1" @change="onFileChange">
+            <n-upload :max="1"   :show-file-list="false"  @change="onFileChange">
               <n-button block>
-                Seleccionar archivo
+                 {{ file ? file.name.slice(0, 20) + '...' : 'Seleccionar archivo' }}
               </n-button>
             </n-upload>
           </n-form-item>
@@ -37,28 +37,28 @@
 
                 <!-- EJE_X -->
         <n-grid-item>
-          <n-form-item label="Longitud / Eje x" :show-feedback="false">
+          <n-form-item label="Longitud / Eje x (m)" :show-feedback="false">
             <n-input-number v-model:value="x" :min="166000" :max="834000" :step="500" style="width: 100%" />
           </n-form-item>
         </n-grid-item>
 
         <!-- EJE_Y -->
         <n-grid-item>
-          <n-form-item label="Latitud / Eje y" :show-feedback="false">
+          <n-form-item label="Latitud / Eje y (m)" :show-feedback="false">
             <n-input-number v-model:value="y" :min="0" :max="10000000" :step="500" style="width: 100%" />
           </n-form-item>
         </n-grid-item>
 
         <!-- MAGNITUD -->
         <n-grid-item>
-          <n-form-item label="Magnitud" :show-feedback="false">
+          <n-form-item label="Magnitud (Richter)" :show-feedback="false">
             <n-input-number v-model:value="magnitude" :min="0" :max="10" :step="0.1" style="width: 100%" />
           </n-form-item>
         </n-grid-item>
 
         <!-- PROFUNDIDAD -->
         <n-grid-item>
-          <n-form-item label="Profundidad" :show-feedback="false">
+          <n-form-item label="Profundidad (m)" :show-feedback="false">
             <n-input-number v-model:value="depth" :min="1000" :max="10000" :step="100" style="width: 100%" />
           </n-form-item>
         </n-grid-item>
@@ -102,8 +102,8 @@ import { runSimulation } from '@/services/api'
 import { epicenter } from '../services/simulationStore'
 const file = ref<File | null>(null)
 const magnitude =  ref(6.5)
-const x =  ref(787671.8935)
-const y = ref(9992673.3202)
+const x =  ref(763122.112)
+const y = ref(9861762.92)
 const depth = ref(10000)
 const loading = ref(false)
 

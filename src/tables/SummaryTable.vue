@@ -21,7 +21,16 @@
       {{ summary.nodes_below_required_percent }} %
     </n-descriptions-item>
     <n-descriptions-item label="Tuberías críticas">
-      {{ summary.pipes_major_leak_gt_05 }}
+      {{ summary.avg_major_leak_prob }}
+    </n-descriptions-item>
+        <n-descriptions-item label="Disponibilidad del servicio (%)">
+      {{ summary.wsa_avg }}
+    </n-descriptions-item>
+            <n-descriptions-item label="Índice de resiliencia hidráulica">
+      {{ summary.todini_index }}
+    </n-descriptions-item>
+            <n-descriptions-item label="Entropía del sistema">
+      {{ summary.system_entropy }}
     </n-descriptions-item>
   </n-descriptions>
 

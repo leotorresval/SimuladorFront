@@ -1,19 +1,35 @@
 <template>
-  <div class="fragility-wrapper">
+<div class="fragility-wrapper">
+  
+  <!-- CASO: hay datos -->
+  <div v-if="chartData && active" class="chart-container">
+    
+    <!-- BOTONES -->
+    <div class="chart-actions">
+      <button @click="exportFragility">XLSX</button>
+      <button @click="exportImage">PNG</button>
+    </div>
+
+    <!-- GRÁFICA -->
     <Line
-      v-if="chartData && active"
       :key="active"
       ref="chartRef"
       :data="chartData"
       :options="options"
     />
-    <div v-else class="empty">
-      Ejecuta una simulación para ver la curva de fragilidad
-    </div>
+
   </div>
+
+  <!-- CASO: no hay datos -->
+  <div v-else class="empty">
+    Ejecuta una simulación para ver la curva de fragilidad
+  </div>
+
+</div>
 </template>
 
 <script setup>
+import * as XLSX from 'xlsx'
 import { computed, ref } from 'vue'
 import { Line } from 'vue-chartjs'
 import {
@@ -61,7 +77,7 @@ const options = {
   plugins: {
     title: {
       display: true,
-      text: 'Fragility Curve'
+      text: 'Curva de fragilidad considerando incertidumbre en parámetros'
     },
     legend: {
       position: 'top'
@@ -72,7 +88,7 @@ const options = {
       type: 'linear',
       title: {
         display: true,
-        text: 'Repair rate × pipe length'
+        text: 'Aceleración máxima - PGA [g]'
       }
     },
     y: {
@@ -80,7 +96,7 @@ const options = {
       max: 1,
       title: {
         display: true,
-        text: 'Probability of exceeding a damage state'
+        text: 'Probabilidad de falla'
       }
     }
   }
@@ -92,7 +108,7 @@ const chartData = computed(() => {
 
   return {
 datasets: props.data.states.map((state, idx) => ({
-  label: state.name,
+  label: idx === 0 ? 'Estado de daño menor' : 'Estado de daño mayor',
   data: props.data.x.map((xVal, i) => ({
     x: xVal,
     y: state.y[i]
@@ -115,6 +131,40 @@ datasets: props.data.states.map((state, idx) => ({
 
   }
 })
+
+
+function exportFragility() {
+  const x = props.data.x
+  const states = props.data.states
+
+  const rows = x.map((val, i) => {
+    const row = { x: val }
+
+    states.forEach(state => {
+      row[state.name] = state.y[i]
+    })
+
+    return row
+  })
+
+  const worksheet = XLSX.utils.json_to_sheet(rows)
+  const workbook = XLSX.utils.book_new()
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Fragility")
+
+  XLSX.writeFile(workbook, "fragility_curve.xlsx")
+}
+
+function exportImage() {
+  const chart = chartRef.value?.chart
+  const url = chart.toBase64Image()
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'fragility_curve.png'
+  link.click()
+}
+
 </script>
 
 <style scoped>
@@ -131,5 +181,33 @@ datasets: props.data.states.map((state, idx) => ({
   justify-content: center;
   color: #888;
   font-style: italic;
+}
+
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.chart-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.chart-actions button {
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.chart-actions button:hover {
+  background: #f0f0f0;
 }
 </style>

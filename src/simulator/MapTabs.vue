@@ -1,6 +1,12 @@
 
 <template>
     <div ref="tabsWrapper" class="tabs-wrapper">
+      <div style="margin-bottom: 10px;">
+        <label>
+          <input type="checkbox" v-model="showBaseMap" />
+          Mostrar mapa base
+        </label>
+      </div>
   <n-tabs
     type="line"
     animated
@@ -13,7 +19,7 @@
         :nodes="nodes"
         :pipes="pipes"
         :epicenter="epicenter"
-
+        :showBaseMap="showBaseMap"
         :active="activeTab === 'map1'"
       />
     </n-tab-pane>
@@ -24,7 +30,7 @@
         :nodes="nodes"
         :pipes="pipes"
         :epicenter="epicenter"
-
+        :showBaseMap="showBaseMap"
         :active="activeTab === 'map2'"
       />
     </n-tab-pane>
@@ -35,6 +41,7 @@
         :nodes="nodes"
         :pipes="pipes"
         :epicenter="epicenter"
+        :showBaseMap="showBaseMap"
         :active="activeTab === 'map3'"
       />
     </n-tab-pane>
@@ -45,6 +52,7 @@
         :nodes="nodes"
         :pipes="pipes"
         :epicenter="epicenter"
+        :showBaseMap="showBaseMap"
         :active="activeTab === 'map4'"
       />
     </n-tab-pane>
@@ -55,21 +63,34 @@
       />
 
     </n-tab-pane>
+    <n-tab-pane name="map7" tab="DEMANDA DE FUGA">
+      <LeakDemandChart
+        :data="simulationResult"
+        :active="activeTab === 'map7'"
+      />
+
+    </n-tab-pane>
+
   </n-tabs>
   </div>
 </template>
 
 <script setup lang="ts">
+
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { NTabs, NTabPane } from 'naive-ui'
 import MapView from './MapView.vue'
 import { epicenter } from '@/services/simulationStore'
 import FragilityCurve from './FragilityCurve.vue'
+import LeakDemandChart from './LeakDemandChart.vue'
 import { simulationResult} from '@/services/simulationStore'
+
 defineProps({
   nodes: Array,
   pipes: Array
 })
+
+const showBaseMap = ref(true)
 
 const activeTab = ref('map1')
 const tabsWrapper = ref<HTMLElement | null>(null)
@@ -97,5 +118,11 @@ onBeforeUnmount(() => {
 <style scoped>
 .tabs-wrapper {
   width: 100%;
+  height: calc(100vh - 200px); /* ajusta según tu header */
+}
+:deep(.n-tabs),
+:deep(.n-tabs-content),
+:deep(.n-tab-pane) {
+  height: 97%;
 }
 </style>

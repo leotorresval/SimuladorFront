@@ -88,13 +88,11 @@ setStatus('info', 'Preparando descarga…')
       `${API_BASE}/export/${activeTab.value}?format=${format}`
     )
 
-    // ❌ ERROR DEL BACKEND
     if (!response.ok) {
       const errorJson = await response.json()
       throw new Error(errorJson.message || 'Error al exportar datos')
     }
 
-    // ✅ ARCHIVO CORRECTO
     const blob = await response.blob()
     const url = window.URL.createObjectURL(blob)
 
@@ -140,7 +138,7 @@ setStatus('info', 'Preparando descarga…')
 
 .tabs-container {
   flex: 1;
-  min-height: 0; /* 🔥 MUY IMPORTANTE */
+  min-height: 0; 
   display: flex;
   flex-direction: column;
 }
