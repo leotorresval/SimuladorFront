@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vicons/ionicons5": "^0.13.0",
     "axios": "^1.13.4",
     "chart.js": "^4.5.1",
     "file-saver": "^2.0.5",
