@@ -1,10 +1,21 @@
 <template>
-  <div ref="mapRef" class="map-container"></div>
+  <div class="map-wrapper">
+    
+    <!-- BOTONES -->
+    <div class="map-actions">
+      <button @click="exportImage">PNG</button>
+    </div>
+
+    <!-- MAPA -->
+    <div ref="mapRef" class="map-container"></div>
+
+  </div>
 </template>
 
 <script setup>
 import { ref, watch, nextTick } from 'vue'
 import L from 'leaflet'
+import SimpleMapScreenshoter from 'leaflet-simple-map-screenshoter'
 import 'leaflet/dist/leaflet.css'
 
 const props = defineProps({
@@ -24,7 +35,7 @@ let epicenterLayer = null
 let waveInterval = null
 let hasFitted = false
 let baseLayer = null
-
+let screenshoter = null
 /* =========================
    COLORES
 ========================= */
@@ -254,6 +265,23 @@ function getRadiusByZoom() {
   const zoom = map.getZoom()
   return Math.max(2, (zoom - 12) * 1.2)
 }
+
+async function exportImage() {
+  if (!screenshoter) return
+
+  try {
+    const image = await screenshoter.takeScreen('image')
+
+    const link = document.createElement('a')
+    link.href = image
+    link.download = 'map.png'
+    link.click()
+  } catch (e) {
+    console.error('Error exportando mapa', e)
+  }
+}
+
+
 /* =========================
    WATCHERS
 ========================= */
@@ -272,6 +300,10 @@ watch(
       // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       //   attribution: '&copy; OpenStreetMap contributors'
       // }).addTo(map)
+
+        screenshoter = new SimpleMapScreenshoter({
+          hidden: true
+        }).addTo(map)
 
         if (!props.showBaseMap) {
           map.removeLayer(baseLayer)
@@ -358,5 +390,27 @@ watch(
   z-index: 1000;
 }
 
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
 
+.map-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+
+  display: flex;
+  gap: 8px;
+}
+
+.map-actions button {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 6px;
+}
 </style>
