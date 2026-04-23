@@ -317,10 +317,10 @@ watch(
         })
     }
 
-    setTimeout(() => {
-      map.invalidateSize()
-      drawMap({ fit: false })
-    }, 60)
+setTimeout(() => {
+  map.invalidateSize()
+  drawMap({ fit: false })
+}, 100)
   },
   { immediate: true }
 )
@@ -360,8 +360,8 @@ watch(
 .map-container {
   width: 100%;
   height: 100%;
-  min-height: 370px;
-    position: relative;     /* 🔥 CLAVE */
+  min-height: 470px;
+    position: relative;
   z-index: 0;  
 }
 

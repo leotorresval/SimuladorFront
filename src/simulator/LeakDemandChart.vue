@@ -111,20 +111,38 @@ const options = {
    EXPORTAR XLSX
 ========================= */
 function exportData() {
-  if (!props.data?.pipes) return
+  if (!props.data?.leak_demand_curve) return
 
-  const exportData = props.data.pipes.map(p => ({
-    id: p.id,
-    flowrate_lps: p.flowrate_lps
-  }))
+  const { time, series } = props.data.leak_demand_curve
 
-  const ws = XLSX.utils.json_to_sheet(exportData)
+  // 🔥 FILTRAR SOLO LAS SERIES QUE TE INTERESAN
+  const filteredSeries = series.filter(s => s.name.startsWith('Leak_'))
+
+  // 🔥 HEADERS LIMPIOS
+  const headers = ['time', ...filteredSeries.map(s => s.name)]
+
+  // 🔥 FILAS
+  const rows = time.map((t, i) => {
+    const row = { time: t }
+
+    filteredSeries.forEach(s => {
+      row[s.name] = s.y[i]
+    })
+
+    return row
+  })
+
+  // 🔥 TABLA CONTROLADA (SIN BASURA)
+  const ws = XLSX.utils.aoa_to_sheet([
+    headers,
+    ...rows.map(r => headers.map(h => r[h]))
+  ])
+
   const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Leak Demand')
 
-  XLSX.utils.book_append_sheet(wb, ws, 'Flowrate')
-  XLSX.writeFile(wb, 'flowrate.xlsx')
+  XLSX.writeFile(wb, 'leak_demand.xlsx')
 }
-
 /* =========================
    EXPORTAR IMAGEN
 ========================= */
@@ -143,9 +161,9 @@ function exportImage() {
 
 <style scoped>
 .chart-wrapper {
+  width: 99%;
   height: 94%;
-  display: flex;
-  flex-direction: column;
+  padding: 12px;
 }
 
 .chart-actions {

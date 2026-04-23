@@ -118,7 +118,8 @@ onBeforeUnmount(() => {
 <style scoped>
 .tabs-wrapper {
   width: 100%;
-  height: calc(100vh - 200px); /* ajusta según tu header */
+  height: calc(100vh - 20%);
+   overflow: hidden; 
 }
 :deep(.n-tabs),
 :deep(.n-tabs-content),
