@@ -27,9 +27,22 @@
         <!-- ARCHIVO INP -->
         <n-grid-item >
           <n-form-item label="Archivo INP" :show-feedback="false">
-            <n-upload :max="1"   :show-file-list="false"  @change="onFileChange">
+            <n-upload
+              ref="uploadRef"
+              :max="1"
+              :show-file-list="false"
+              @change="onFileChange"
+            >
               <n-button block>
-                 {{ file ? file.name.slice(0, 20) + '...' : 'Seleccionar archivo' }}
+                <template v-if="file">
+                  {{ file.name.slice(0, 20) + '...' }}
+                  <span style="margin-left: 10px; color: red; cursor: pointer;" @click.stop="removeFile">
+                    ❌
+                  </span>
+                </template>
+                <template v-else>
+                  Seleccionar archivo
+                </template>
               </n-button>
             </n-upload>
           </n-form-item>
@@ -106,7 +119,7 @@ const x =  ref(763122.112)
 const y = ref(9861762.92)
 const depth = ref(10000)
 const loading = ref(false)
-
+const uploadRef = ref()
 const emit = defineEmits<{
   (e: 'simulation-done', result: any): void
 }>()
@@ -114,6 +127,11 @@ const emit = defineEmits<{
 
 function onFileChange({ file: uploadFile }: any) {
   file.value = uploadFile?.file ?? null
+}
+
+function removeFile() {
+  file.value = null
+  uploadRef.value?.clear() 
 }
 
 async function onSimulate() {
