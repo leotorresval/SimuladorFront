@@ -70,6 +70,12 @@
       />
 
     </n-tab-pane>
+    <n-tab-pane name="map8" tab="CURVA DE PRESIÓN PROMEDIO">
+      <PressureAvgChart
+        :data="simulationResult.pressure_avg_curve"
+        :active="activeTab === 'map8'"
+      />
+    </n-tab-pane>
 
   </n-tabs>
   </div>
@@ -83,7 +89,8 @@ import MapView from './MapView.vue'
 import { epicenter } from '@/services/simulationStore'
 import FragilityCurve from './FragilityCurve.vue'
 import LeakDemandChart from './LeakDemandChart.vue'
-import { simulationResult} from '@/services/simulationStore'
+import PressureAvgChart from './PressureAvgChart.vue'
+import {simulationResult} from '@/services/simulationStore'
 
 defineProps({
   nodes: Array,
