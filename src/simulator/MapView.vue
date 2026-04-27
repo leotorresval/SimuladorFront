@@ -270,17 +270,124 @@ async function exportImage() {
   if (!screenshoter) return
 
   try {
-    const image = await screenshoter.takeScreen('image')
+    const mapImage = await screenshoter.takeScreen('image')
 
-    const link = document.createElement('a')
-    link.href = image
-    link.download = 'map.png'
-    link.click()
+    const img = new Image()
+    img.src = mapImage
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+
+      canvas.width = img.width
+      canvas.height = img.height
+
+      // 🗺 dibujar mapa
+      ctx.drawImage(img, 0, 0)
+
+      // 📌 dibujar leyenda
+      drawLegend(ctx, canvas.width, canvas.height)
+
+      // 💾 descargar
+      const link = document.createElement('a')
+      link.href = canvas.toDataURL('image/png')
+      link.download = 'map.png'
+      link.click()
+    }
+
   } catch (e) {
     console.error('Error exportando mapa', e)
   }
 }
 
+function drawLegend(ctx, width, height) {
+  const legend = getLegendItems()
+  if (!legend) return
+
+  const { title, items } = legend
+
+  const boxWidth = 140
+  const boxHeight = 30 + items.length * 20
+
+  const x = width - boxWidth - 10
+  let y = height - boxHeight - 10
+
+  // fondo
+  ctx.fillStyle = 'white'
+  ctx.fillRect(x, y, boxWidth, boxHeight)
+
+  ctx.strokeStyle = '#ccc'
+  ctx.strokeRect(x, y, boxWidth, boxHeight)
+
+  // título
+  ctx.fillStyle = 'black'
+  ctx.font = 'bold 12px Arial'
+  ctx.fillText(title, x + 10, y + 15)
+
+  // items
+  ctx.font = '12px Arial'
+  y += 25
+
+  items.forEach(item => {
+    ctx.fillStyle = item.color
+    ctx.fillRect(x + 10, y - 8, 12, 12)
+
+    ctx.fillStyle = 'black'
+    ctx.fillText(item.label, x + 30, y)
+
+    y += 18
+  })
+}
+
+function getLegendItems() {
+  if (props.mapType === 'pressure') {
+    return {
+      title: 'Presión (m)',
+      items: [
+        { color: '#d73027', label: '< 5' },
+        { color: '#fc8d59', label: '5 – 15' },
+        { color: '#fee08b', label: '15 – 30' },
+        { color: '#d9ef8b', label: '30 – 50' },
+        { color: '#1a9850', label: '> 50' }
+      ]
+    }
+  }
+
+  if (props.mapType === 'damage') {
+    return {
+      title: 'Daño',
+      items: [
+        { color: '#d73027', label: 'Major Leak' },
+        { color: '#fc8d59', label: 'Minor Leak' },
+        { color: '#91bfdb', label: 'Sin daño' }
+      ]
+    }
+  }
+
+  if (props.mapType === 'pga') {
+    return {
+      title: 'PGA',
+      items: [
+        { color: '#d73027', label: '> 0.5' },
+        { color: '#fc8d59', label: '0.3 – 0.5' },
+        { color: '#fee08b', label: '< 0.3' }
+      ]
+    }
+  }
+
+  if (props.mapType === 'rr') {
+    return {
+      title: 'Repair Rate',
+      items: [
+        { color: '#d73027', label: '> 0.3' },
+        { color: '#fc8d59', label: '0.1 – 0.3' },
+        { color: '#1a9850', label: '< 0.1' }
+      ]
+    }
+  }
+
+  return null
+}
 
 /* =========================
    WATCHERS
@@ -413,4 +520,9 @@ watch(
   cursor: pointer;
   border-radius: 6px;
 }
+
+.leaflet-container {
+  background: white !important;
+}
+
 </style>
