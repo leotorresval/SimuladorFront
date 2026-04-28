@@ -61,9 +61,9 @@ const chartRef = ref(null)
 
 /* 🔥 CLAVE: múltiples series */
 const chartData = computed(() => {
-  if (!props.data || !props.data.leak_demand_curve) return null
+  if (!props.data || !props.data.leak_demand_curve_repair) return null
 
-  const { time, series } = props.data.leak_demand_curve
+  const { time, series } = props.data.leak_demand_curve_repair
 
   return {
     labels: time,
@@ -89,7 +89,7 @@ const options = {
   plugins: {
     title: {
       display: true,
-      text: 'Demanda de fuga sin reparación'
+      text: 'Demanda de fuga con reparación'
     },
     legend: {
       display: false  
@@ -116,9 +116,9 @@ const options = {
    EXPORTAR XLSX
 ========================= */
 function exportData() {
-  if (!props.data?.leak_demand_curve) return
+  if (!props.data?.leak_demand_curve_repair) return
 
-  const { time, series } = props.data.leak_demand_curve
+  const { time, series } = props.data.leak_demand_curve_repair
 
   // 🔥 FILTRAR SOLO LAS SERIES QUE TE INTERESAN
   const filteredSeries = series.filter(s => s.name.startsWith('Leak_'))
@@ -146,7 +146,7 @@ function exportData() {
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Leak Demand')
 
-  XLSX.writeFile(wb, 'leak_demand.xlsx')
+  XLSX.writeFile(wb, 'leak_demand_repair.xlsx')
 }
 /* =========================
    EXPORTAR IMAGEN
@@ -159,7 +159,7 @@ function exportImage() {
 
   const a = document.createElement('a')
   a.href = url
-  a.download = 'flowrate.png'
+  a.download = 'leak_demand_repair.png'
   a.click()
 }
 </script>

@@ -1,24 +1,21 @@
 <template>
   <div class="chart-wrapper">
 
-    <!-- BOTONES -->
-    <div v-if="chartData" class="chart-actions">
-      <button @click="exportData">XLSX</button>
-      <button @click="exportImage">PNG</button>
-    </div>
-
-    <!-- GRÁFICA -->
 <div v-if="chartData && active" class="chart-container">
+
+  <!-- BOTONES -->
+  <div class="chart-actions">
+    <button @click="exportData">XLSX</button>
+    <button @click="exportImage">PNG</button>
+  </div>
+
+  <!-- GRÁFICA -->
   <Line
     ref="chartRef"
     :data="chartData"
     :options="options"
   />
 </div>
-
-    <div v-else class="empty">
-      Ejecuta una simulación
-    </div>
 
   </div>
 </template>
@@ -145,19 +142,51 @@ function exportData() {
   flex-direction: column;
 }
 
+/* BOTONES A LA DERECHA (flotantes) */
 .chart-actions {
-  margin-bottom: 10px;
-  flex-shrink: 0; /* 🔥 no deja que reduzca tamaño */
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
 }
 
-.chart-container {
-  flex: 1;              /* 🔥 ocupa todo el espacio restante */
-  min-height: 0;        /* 🔥 importante para evitar overflow raro */
+/* 🔥 BOTONES NEGROS */
+.chart-actions button {
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
+
+/* hover */
+.chart-actions button:hover {
+  background: #222;
+  border-color: #222;
+}
+
+/* click */
+.chart-actions button:active {
+  transform: scale(0.95);
+}
+
 .empty {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
 }
+
+.chart-container {
+  position: relative;   /* 🔥 clave para overlay */
+  flex: 1;
+  min-height: 0;
+}
+
 </style>

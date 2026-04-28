@@ -199,12 +199,15 @@ function exportImage() {
 }
 
 .chart-actions button {
-  background: rgba(255,255,255,0.9);
-  border: 1px solid #ccc;
-  padding: 4px 8px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  padding: 5px 10px;
   cursor: pointer;
   font-size: 12px;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .chart-actions button:hover {

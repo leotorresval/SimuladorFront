@@ -63,17 +63,32 @@
       />
 
     </n-tab-pane>
-    <n-tab-pane name="map7" tab="DEMANDA DE FUGA">
+    <n-tab-pane name="map7" tab="DEMANDA DE FUGA S/R">
       <LeakDemandChart
         :data="simulationResult"
         :active="activeTab === 'map7'"
       />
-
     </n-tab-pane>
-    <n-tab-pane name="map8" tab="CURVA DE PRESIÓN PROMEDIO">
+
+    <n-tab-pane name="map8" tab="DEMANDA DE FUGA C/R">
+      <LeakDemandRepair
+        :data="simulationResult"
+        :active="activeTab === 'map8'"
+      />
+    </n-tab-pane>
+
+    <n-tab-pane name="map9" tab="CURVA DE RECUPERACIÓN">
+      <RecoveryCurve
+        :data="simulationResult.recovery_curve"
+        :resilience="simulationResult.resilience_index"
+        :active="activeTab === 'map9'"
+      />
+    </n-tab-pane>
+
+    <n-tab-pane name="map10" tab="CURVA DE PRESIÓN PROMEDIO">
       <PressureAvgChart
         :data="simulationResult.pressure_avg_curve"
-        :active="activeTab === 'map8'"
+        :active="activeTab === 'map10'"
       />
     </n-tab-pane>
 
@@ -91,6 +106,8 @@ import FragilityCurve from './FragilityCurve.vue'
 import LeakDemandChart from './LeakDemandChart.vue'
 import PressureAvgChart from './PressureAvgChart.vue'
 import {simulationResult} from '@/services/simulationStore'
+import RecoveryCurve from './RecoveryCurve.vue'
+import LeakDemandRepair from './LeakDemandRepair.vue'
 
 defineProps({
   nodes: Array,

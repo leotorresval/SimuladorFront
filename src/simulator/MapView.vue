@@ -514,11 +514,14 @@ watch(
 }
 
 .map-actions button {
-  background: white;
-  border: 1px solid #ccc;
-  padding: 6px 10px;
+  background: #000;          /* fondo negro */
+  color: #fff;               /* texto blanco */
+  border: 1px solid #000;
+  padding: 6px 12px;
   cursor: pointer;
   border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .leaflet-container {
