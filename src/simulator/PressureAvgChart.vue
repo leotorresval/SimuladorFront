@@ -62,7 +62,7 @@ const chartData = computed(() => {
         {
           label: 'Presión promedio (m)',
           data: props.data.values,
-          tension: 0.4,
+          tension: 0,
 
           borderColor: '#36A2EB',          // 🔵 línea azul fuerte
           backgroundColor: 'rgba(54,162,235,0.2)', // área suave

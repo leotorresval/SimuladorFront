@@ -71,18 +71,18 @@ const chartData = computed(() => {
         data: props.data.no_repair,
         borderColor: '#e53935', // rojo
         backgroundColor: '#e53935',
-        borderWidth: 3,
-        pointRadius: 3,
-        tension: 0.3
+        borderWidth: 1.7,
+        pointRadius: 2,
+        tension: 0
       },
       {
         label: 'Con reparación',
         data: props.data.repair,
         borderColor: '#43a047', // verde
         backgroundColor: '#43a047',
-        borderWidth: 3,
-        pointRadius: 3,
-        tension: 0.3
+        borderWidth: 4,
+        pointRadius: 1.5,
+        tension: 0
       }
     ]
   }

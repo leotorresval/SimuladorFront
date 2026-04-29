@@ -77,7 +77,7 @@
       />
     </n-tab-pane>
 
-    <n-tab-pane name="map9" tab="CURVA DE RECUPERACIÓN">
+    <n-tab-pane name="map9" tab="GRAFICA DE RECUPERACIÓN">
       <RecoveryCurve
         :data="simulationResult.recovery_curve"
         :resilience="simulationResult.resilience_index"
@@ -85,7 +85,7 @@
       />
     </n-tab-pane>
 
-    <n-tab-pane name="map10" tab="CURVA DE PRESIÓN PROMEDIO">
+    <n-tab-pane name="map10" tab="PRESIÓN PROMEDIO">
       <PressureAvgChart
         :data="simulationResult.pressure_avg_curve"
         :active="activeTab === 'map10'"
