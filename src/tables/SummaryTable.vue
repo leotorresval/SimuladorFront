@@ -33,10 +33,23 @@
       </div>
     </n-descriptions-item>
         <n-descriptions-item label="Disponibilidad del servicio (%)">
-      {{ summary.wsa_avg }}
+        {{ (summary.wsa_avg * 100).toFixed(0) }} %
     </n-descriptions-item>
-            <n-descriptions-item label="Índice de resiliencia hidráulica">
+    <n-descriptions-item label="Índice de Todini">
       {{ summary.todini_index }}
+    </n-descriptions-item>
+    <n-descriptions-item
+      v-if="resilienceIndex?.no_repair !== null && resilienceIndex?.no_repair !== undefined"
+      label="Resiliencia sin reparación (%)"
+    >
+      {{ (resilienceIndex.no_repair * 100).toFixed(1) }} %
+    </n-descriptions-item>
+
+    <n-descriptions-item
+      v-if="resilienceIndex?.repair !== null && resilienceIndex?.repair !== undefined"
+      label="Resiliencia con reparación (%)"
+    >
+      {{ (resilienceIndex.repair * 100).toFixed(1) }} %
     </n-descriptions-item>
     <!-- <n-descriptions-item label="Entropía del sistema">
       {{ summary.system_entropy }}
@@ -55,6 +68,7 @@ import * as XLSX from 'xlsx'
 import { NButton, NIcon } from 'naive-ui'
 import { DownloadOutline } from '@vicons/ionicons5'
 const summary = computed(() => simulationResult.value?.summary)
+const resilienceIndex = computed(() => simulationResult.value?.resilience_index ?? null)
 function exportPipesToFix() {
   if (!summary.value?.pipes_to_fix) return
 
